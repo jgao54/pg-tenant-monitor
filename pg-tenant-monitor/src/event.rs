@@ -72,6 +72,8 @@ fn get_ebpf_perf_array(ebpf: &mut Ebpf) -> Result<AsyncPerfEventArray<MapData>, 
         .map_err(Into::into)
 }
 
+// TODO: instead of sending everything to userspace, it should be much more efficient
+// to filter out irrelevant queries in kernelspace (i.e. queries without tenant_id can be dropped)
 fn process_event(event: QueryEvent) -> Option<ProcessedQueryEvent> {
     let query = String::from_utf8_lossy(&event.query);
     let tenant_id = extract_tenant_id(&query)?;

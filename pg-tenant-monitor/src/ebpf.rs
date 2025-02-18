@@ -7,11 +7,16 @@ const TARGET: &str = "/usr/lib/postgresql/16/bin/postgres";
 
 // Offset for 'exec_simple_query' is found using the following command:
 // $ gdb /usr/lib/postgresql/16/bin/postgres
-// (gdb)  info aress exec_simple_query
+// (gdb)  info address exec_simple_query
 // TODO: find offset reliably at runtime
 const EXEC_SIMPLE_QUERY_OFFSET: u64 = 0x5408b0;
 
 // eBPF programs that get attached to the target
+// We use 'exec_smple_query' to proxy query cpu time, but
+// technically this only measures the wall-clock time between
+// the entry and exit of this function.
+// TODO: make this more precise by subtracting time not doing
+// actual CPU work.
 const EBPF_PROGRAMS: [&str; 2] = ["exec_simple_query_enter", "exec_simple_query_return"];
 
 pub fn init_ebpf() -> Result<aya::Ebpf, Box<dyn Error>> {
